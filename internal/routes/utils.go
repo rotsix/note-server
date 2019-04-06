@@ -8,7 +8,8 @@ func Success(rw http.ResponseWriter) {
 }
 
 // WriteJSON sets [rw] header's content-type to JSON, and sends [msg] (a JSON)
-func WriteJSON(rw http.ResponseWriter, msg []byte) {
+func WriteJSON(rw http.ResponseWriter, msg string) {
 	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(msg)
+	m := []byte(msg)
+	rw.Write(m)
 }

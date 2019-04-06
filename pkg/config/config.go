@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -10,16 +9,25 @@ import (
 
 // Config describes an app configuration
 type Config struct {
-	Location string `json:"location"`
-	DbUser   string `json:"db_user"`
-	DbPass   string `json:"db_pass"`
+	Location  string            `json:"location"`
+	Prod      bool              `json:"prod"`
+	Databases map[string]DbType `json:"databases"`
+}
+
+type DbType struct {
+	Host   string `json:"host"`
+	Port   int    `json:"port"`
+	Driver string `json:"driver"`
+	Name   string `json:"name"`
+	User   string `json:"user"`
+	Pass   string `json:"pass"`
 }
 
 // Parse parses args, config file, and returns a Config
 func Parse() *Config {
 	config := new(Config)
 
-	log.Println("/pkg/config/config.go:Parse: fix how to get config location")
+	log.Println("/pkg/config/config.go:Parse: # TODO fix how to get config location")
 	config.Location = os.Getenv("GOPATH") + "/src/server/configs/config.json"
 	file, err := ioutil.ReadFile(config.Location)
 	if err != nil {
@@ -32,17 +40,4 @@ func Parse() *Config {
 	}
 
 	return config
-}
-
-// ToString converts a Config into a readable string
-func ToString(conf Config) string {
-	var buff bytes.Buffer
-	buff.WriteString("\ncurrent config:")
-
-	buff.WriteString("\n  location: ")
-	buff.WriteString(conf.Location)
-	buff.WriteString("\n  db_user:  ")
-	buff.WriteString(conf.DbUser)
-
-	return buff.String()
 }

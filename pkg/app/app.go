@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/internal/routes"
 	"server/pkg/config"
+	"server/pkg/users"
 
 	"github.com/gorilla/mux"
 )
@@ -12,7 +13,7 @@ import (
 // Run is the app main loop
 func Run() {
 	conf := config.Parse()
-	log.Println(config.ToString(*conf))
+	users.Init(conf)
 
 	r := mux.NewRouter()
 	routes.HandleUsers(r.PathPrefix("/users/").Subrouter())
