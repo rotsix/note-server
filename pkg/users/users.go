@@ -36,7 +36,7 @@ func Init(conf *config.Config) {
 	log.Println("connected to database")
 }
 
-// Login returns a token, empty in case of fail
+// Login returns a token, or an error in case of fail
 func Login(user, password string) (string, error) {
 	if user == "" || password == "" {
 		return "", errors.New("user not found")
