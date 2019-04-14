@@ -29,7 +29,6 @@ func initDbCon(name string, dbConf config.DbType) error {
 		return fmt.Errorf("cannot ping db '%s': %s", name, err)
 	}
 
-	log.Printf("connected to database '%s'", name)
 	return nil
 }
 
@@ -118,7 +117,7 @@ func Drop(name string, conf *config.Config) error {
 // DropDb with given [name], using [conf]
 func DropDb(name string, conf config.DbType) error {
 	if err := initDbCon(conf.User, conf); err != nil {
-		return fmt.Errorf("using '%s' settings: %s", name, err)
+		return err
 	}
 	query := fmt.Sprintf("DROP DATABASE %s", name)
 	if _, err := dbCons[conf.User].Exec(query); err != nil {
@@ -149,7 +148,7 @@ func Fill(name string, conf *config.Config) error {
 func FillDb(name string, conf config.DbType) error {
 	switch name {
 	case "users":
-		if err := fillUsers(conf); err != nil {
+		if err := fillUsers(name, conf); err != nil {
 			return err
 		}
 	default:
@@ -158,6 +157,39 @@ func FillDb(name string, conf config.DbType) error {
 	return nil
 }
 
-func fillUsers(conf config.DbType) error {
+func fillUsers(name string, conf config.DbType) error {
+	if err := initDbCon(name, conf); err != nil {
+		return err
+	}
+
+	for table := range conf.Tables {
+		if err := fillUsersTable(name, table, conf.Tables[table]); err != nil {
+			return fmt.Errorf("cannot fill table '%s' in '%s': %s", table, name, err)
+		}
+	}
+	return nil
+}
+
+func fillUsersTable(db, name string, conf config.TableType) error {
+	for user := range conf.MockData {
+		var query, bk, bv strings.Builder
+
+		userConf := conf.MockData[user]
+		query.WriteString("INSERT INTO " + name + "(")
+		for k, v := range userConf {
+			bk.WriteString(k + ",")
+			bv.WriteString("'" + v + "',")
+		}
+		query.WriteString(bk.String()[:len(bk.String())-1])
+		query.WriteString(") VALUES (")
+		query.WriteString(bv.String()[:len(bv.String())-1])
+		query.WriteString(")")
+
+		if _, err := dbCons[db].Exec(query.String()); err != nil {
+			log.Printf("cannot insert into '%s/%s': %s", db, name, err)
+		}
+	}
+
+	log.Printf("filled table '%s' in '%s' (mock data)", name, db)
 	return nil
 }
