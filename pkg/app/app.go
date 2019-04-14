@@ -13,7 +13,9 @@ import (
 // Run is the app main loop
 func Run() {
 	conf := config.Parse()
-	users.Init(conf)
+	if err := users.Init(conf); err != nil {
+		log.Println("users' db init: ", err)
+	}
 
 	r := mux.NewRouter()
 	routes.HandleUsers(r.PathPrefix("/users/").Subrouter())
