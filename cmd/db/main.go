@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"server/pkg/config"
 	"server/pkg/dbcli"
@@ -16,63 +17,63 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "create",
-			Usage: "create given database, or all if unspecified",
+			Usage: "create [database [table]] all if unspecified",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:        "f",
-					Usage:       "force action (drop then create)",
+					Usage:       "force action (drop; create)",
 					Destination: &force,
 				},
 			},
 			Action: func(c *cli.Context) error {
 				if force {
-					if err := dbcli.Drop(c.Args().First(), conf); err != nil {
-						panic(err)
+					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1), conf); err != nil {
+						log.Println(err)
 					}
 				}
-				return dbcli.Create(c.Args().First(), conf)
+				return dbcli.Create(c.Args().First(), c.Args().Get(1), conf)
 			},
 		},
 		{
 			Name:  "drop",
-			Usage: "drop given database, or all if unspecified",
+			Usage: "drop [database [table]] all if unspecified",
 			Action: func(c *cli.Context) error {
-				return dbcli.Drop(c.Args().First(), conf)
+				return dbcli.Drop(c.Args().First(), c.Args().Get(1), conf)
 			},
 		},
 		{
 			Name:  "fill",
-			Usage: "fill given database with mock data, all dbs if unspecified",
+			Usage: "fill [database [table]] all if unspecified",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:        "f",
-					Usage:       "force action (drop, create then fill)",
+					Usage:       "force action (drop; create; fill)",
 					Destination: &force,
 				},
 			},
 			Action: func(c *cli.Context) error {
 				if force {
-					if err := dbcli.Drop(c.Args().First(), conf); err != nil {
-						panic(err)
+					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1), conf); err != nil {
+						log.Println(err)
 					}
-					if err := dbcli.Create(c.Args().First(), conf); err != nil {
+					if err := dbcli.Create(c.Args().First(), c.Args().Get(1), conf); err != nil {
 						panic(err)
 					}
 				}
-				return dbcli.Fill(c.Args().First(), conf)
+				return dbcli.Fill(c.Args().First(), c.Args().Get(1), conf)
 			},
 		},
 		{
 			Name:  "all",
-			Usage: "drop all databases, create new ones, and fill them with mock data (alias for 'fill -f')",
+			Usage: "drop; create; fill",
 			Action: func(c *cli.Context) error {
-				if err := dbcli.Drop("", conf); err != nil {
+				if err := dbcli.Drop("", "", conf); err != nil {
+					log.Println(err)
+				}
+				if err := dbcli.Create("", "", conf); err != nil {
 					panic(err)
 				}
-				if err := dbcli.Create("", conf); err != nil {
-					panic(err)
-				}
-				if err := dbcli.Fill("", conf); err != nil {
+				if err := dbcli.Fill("", "", conf); err != nil {
 					panic(err)
 				}
 				return nil
