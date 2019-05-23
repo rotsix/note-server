@@ -1,14 +1,79 @@
 {
-  "location": "/home/victor/src/go/src/server/configs/config.json",
-  "prod": false,
   "databases": {
   	"users": {
   	  "host": "localhost",
   	  "port": 5432,
   	  "driver": "postgres",
-  	  "name": "users",
   	  "user": "victor",
-  	  "pass": "victor"
-  	}
+  	  "pass": "victor",
+      "desc": "contains users' informations (account relative)",
+      "tables": {
+        "informations": {
+          "desc": "stores users' accounts informations",
+          "fields": {
+            "id": {
+              "type": "bigserial",
+              "constraints": ["primary key"]
+            },
+            "username": {
+              "type": "text",
+              "constraints": ["not null unique"]
+            },
+            "password": {
+              "type": "text",
+              "constraints": ["not null"]
+            },
+            "firstname": {
+              "type": "text"
+            },
+            "lastname": {
+              "type": "text"
+            },
+            "mail": {
+              "type": "text",
+              "constraints": ["not null unique"]
+            },
+            "birthdate": {
+              "type": "date"
+            }
+          },
+          "mock": {
+            "test": {
+              "username": "test",
+              "password": "test",
+              "firstname": "Foo",
+              "lastname": "Bar",
+              "mail": "foo@bar.xyz",
+              "birthdate": "1970-01-01"
+            }
+          }
+        },
+        "sessions": {
+          "desc": "stores users' sessions",
+          "fields": {
+            "id": {
+              "type": "bigserial",
+              "constraints": ["primary key"]
+            },
+            "uid": {
+              "type": "bigserial",
+              "constraints": ["not null"]
+            },
+            "token": {
+              "type": "text",
+              "constraints": ["not null"]
+            },
+            "expiration": {
+              "type": "timestamp without time zone",
+              "constraints": ["not null"]
+            },
+            "last_seen": {
+              "type": "timestamp without time zone",
+              "constraints": ["not null"]
+            }
+          }
+        }
+      }
+    }
   }
 }
