@@ -44,6 +44,8 @@ func Manage(rw http.ResponseWriter, err error) {
 	switch err.(type) {
 	case *BadRequest:
 		http.Error(rw, err.Error(), http.StatusBadRequest)
+	case *Unauthorized:
+		http.Error(rw, err.Error(), http.StatusUnauthorized)
 	case *Forbidden:
 		http.Error(rw, err.Error(), http.StatusForbidden)
 	case *NotFound:
