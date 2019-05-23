@@ -46,6 +46,9 @@ func Create(db, table string, conf *config.Config) error {
 			}
 		}
 	} else {
+		if err := createDb(db, conf.Databases[db]); err != nil {
+			return err
+		}
 		if table == "" {
 			for table := range conf.Databases[db].Tables {
 				if err := createTable(db, table, conf.Databases[db].Tables[table]); err != nil {
@@ -70,7 +73,6 @@ func createDb(db string, conf config.DbType) error {
 		return fmt.Errorf("cannot create database '%s': %s", db, err)
 	}
 	if err := initDbCon(db, conf); err != nil {
-		// set connection to 'db', could be useful when creating tables
 		return err
 	}
 	log.Printf("created database '%s'", db)
