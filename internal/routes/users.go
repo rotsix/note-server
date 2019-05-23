@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"server/pkg/errors"
 	"server/pkg/users"
 
 	"github.com/gorilla/mux"
@@ -18,16 +19,16 @@ func HandleUsers(r *mux.Router) {
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		panic(err)
+		log.Println("routes:login: ", err)
 	}
 	defer r.Body.Close()
 
-	user := r.Form.Get("user")
+	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 
-	token, err := users.Login(user, password)
+	token, err := users.Login(username, password)
 	if err != nil {
-		http.NotFound(rw, r)
+		errors.Manage(rw, err)
 		return
 	}
 
@@ -37,12 +38,15 @@ func login(rw http.ResponseWriter, r *http.Request) {
 
 func logout(rw http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		panic(err)
+		log.Println("routes:logout: ", err)
 	}
 	defer r.Body.Close()
 
 	token := r.Form.Get("token")
-	users.Logout(token)
+	if err := users.Logout(token); err != nil {
+		errors.Manage(rw, err)
+		return
+	}
 	Success(rw)
 }
 
