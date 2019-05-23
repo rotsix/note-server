@@ -15,6 +15,7 @@ func Run() {
 	conf := config.Parse()
 	if err := users.Init(conf); err != nil {
 		log.Println("users' db init: ", err)
+		panic(err)
 	}
 
 	r := mux.NewRouter()
