@@ -1,11 +1,11 @@
 {
   "databases": {
   	"users": {
-  	  "host": "localhost",
+  	  "host": "db",
   	  "port": 5432,
   	  "driver": "postgres",
-  	  "user": "victor",
-  	  "pass": "victor",
+  	  "user": "docker",
+  	  "pass": "docker",
       "desc": "contains users' informations (account relative)",
       "tables": {
         "informations": {
