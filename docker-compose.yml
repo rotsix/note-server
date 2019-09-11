@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
     restart: on-failure
+    environment:
+      - GOPATH=/go
 
   db:
     image: postgres:alpine
