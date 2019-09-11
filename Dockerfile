@@ -1,12 +1,13 @@
 # building
 FROM golang:alpine as builder
 
-RUN apk update && apk add git
+RUN apk update && apk add --update git
 RUN mkdir -p /go/src/server
+ENV GOPATH /go
 COPY . /go/src/server
 WORKDIR /go/src/server
-RUN go get -d ./...
-RUN go build -o ./server cmd/server/main.go
+RUN go get -v -d ./...
+RUN go build -v -o ./server ./cmd/server/main.go
 
 
 # running
