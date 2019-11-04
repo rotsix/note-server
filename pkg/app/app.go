@@ -5,17 +5,23 @@ import (
 	"net/http"
 	"server/internal/routes"
 	"server/pkg/config"
-	"server/pkg/users"
 
 	"github.com/gorilla/mux"
 )
 
 // Run is the app main loop
 func Run() {
-	conf := config.Parse()
-	if err := users.Init(conf); err != nil {
-		log.Println("users' db init: ", err)
+	if err := config.Parse(); err != nil {
+		log.Println("config parsing: ", err)
 		panic(err)
+	}
+
+	for dbName := range config.Config.Databases {
+		if err := config.InitDb(dbName); err != nil {
+			log.Printf("db init '%s': %s", dbName, err)
+			panic(err)
+
+		}
 	}
 
 	r := mux.NewRouter()

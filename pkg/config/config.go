@@ -1,14 +1,25 @@
 package config
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+
+	// postgres driver
+	_ "github.com/lib/pq"
 )
 
 // Config describes an app configuration
-type Config struct {
+var Config *config
+
+// Db stores databases connections
+var Db map[string]*sql.DB = map[string]*sql.DB{}
+
+type config struct {
 	Databases map[string]DbType `json:"databases"`
 }
 
@@ -39,33 +50,66 @@ type FieldType struct {
 	Constraints []string `json:"constraints"`
 }
 
-func getenv(env string) string {
-	res := os.Getenv(env)
-	if res == "" {
-		log.Printf("couldn't read %s from env", env)
+// InitDb initialises databases connections
+func InitDb(name string) error {
+	f := func(dbName string) error {
+		dbConf := Config.Databases[dbName]
+		con := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			dbConf.Host,
+			dbConf.Port,
+			dbConf.User,
+			dbConf.Pass,
+			dbName,
+		)
+
+		var db *sql.DB
+		var err error
+		if db, err = sql.Open(dbConf.Driver, con); err != nil {
+			return err
+		}
+		if err = db.Ping(); err != nil {
+			return err
+		}
+		if db == nil {
+			return errors.New("db is nil")
+		}
+		Db[dbName] = db
+		return nil
 	}
-	return res
+
+	if name == "" {
+		for dbName := range Config.Databases {
+			if err := f(dbName); err != nil {
+				return err
+			}
+			log.Printf("connected to database: %s", dbName)
+		}
+	} else {
+		if err := f(name); err != nil {
+			return err
+		}
+		log.Printf("connected to database: %s", name)
+	}
+	return nil
 }
 
 // Parse parses args, config file, and returns a Config
-func Parse() *Config {
-	log.Println("pkg/config/config.go:Parse: # TODO: get config location properly")
-	confLocation := os.Getenv("GOPATH")
+func Parse() error {
+	confLocation := os.Getenv("CONF_LOCATION")
 	if confLocation == "" {
-		log.Panicln("couldn't read GOPATH in env")
+		return errors.New("couldn't read CONF_LOCATION in env")
 	}
 
-	confLocation += "/src/server/configs/config.json"
 	file, err := ioutil.ReadFile(confLocation)
 	if err != nil {
-		log.Println("error while reading your config file")
-		panic(err)
+		return errors.New("error while reading your config file: " + err.Error())
 	}
 
-	config := new(Config)
-	if err = json.Unmarshal(file, config); err != nil {
-		panic(err)
+	tmp := new(config)
+	if err = json.Unmarshal(file, tmp); err != nil {
+		return errors.New("error while parsing your config file: " + err.Error())
 	}
 
-	return config
+	Config = tmp
+	return nil
 }

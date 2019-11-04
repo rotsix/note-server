@@ -11,52 +11,52 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var dbCons = map[string]*sql.DB{}
-
-func initDbCon(db string, dbConf config.DbType) error {
-	state := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+func superExec(dbName, query string) (sql.Result, error) {
+	dbConf := config.Config.Databases[dbName]
+	con := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		dbConf.Host,
 		dbConf.Port,
 		dbConf.User,
 		dbConf.Pass,
-		db,
+		dbConf.User,
 	)
-	var err error
-	if dbCons[db], err = sql.Open(dbConf.Driver, state); err != nil {
-		return fmt.Errorf("cannot open db '%s': %s", db, err)
-	}
-	if err = dbCons[db].Ping(); err != nil {
-		return fmt.Errorf("cannot ping db '%s': %s", db, err)
-	}
 
-	return nil
+	var db *sql.DB
+	var err error
+	if db, err = sql.Open(dbConf.Driver, con); err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db.Exec(query)
 }
 
 // Create db:table (all if empty)
-func Create(db, table string, conf *config.Config) error {
+func Create(db, table string) error {
 	if db == "" {
-		for db := range conf.Databases {
-			if err := createDb(db, conf.Databases[db]); err != nil {
+		for db := range config.Config.Databases {
+			if err := createDb(db); err != nil {
 				return err
 			}
-			for table := range conf.Databases[db].Tables {
-				if err := createTable(db, table, conf.Databases[db].Tables[table]); err != nil {
+			for table := range config.Config.Databases[db].Tables {
+				if err := createTable(db, table); err != nil {
 					return err
 				}
 			}
 		}
 	} else {
-		if err := createDb(db, conf.Databases[db]); err != nil {
+		if err := createDb(db); err != nil {
 			return err
 		}
 		if table == "" {
-			for table := range conf.Databases[db].Tables {
-				if err := createTable(db, table, conf.Databases[db].Tables[table]); err != nil {
+			for table := range config.Config.Databases[db].Tables {
+				if err := createTable(db, table); err != nil {
 					return err
 				}
 			}
 		} else {
-			if err := createTable(db, table, conf.Databases[db].Tables[table]); err != nil {
+			if err := createTable(db, table); err != nil {
 				return err
 			}
 		}
@@ -64,29 +64,26 @@ func Create(db, table string, conf *config.Config) error {
 	return nil
 }
 
-func createDb(db string, conf config.DbType) error {
-	if err := initDbCon(conf.User, conf); err != nil {
-		return err
+func createDb(dbName string) error {
+	query := fmt.Sprintf("CREATE DATABASE %s", dbName)
+	if _, err := superExec(dbName, query); err != nil {
+		return fmt.Errorf("cannot create database '%s': %s", dbName, err)
 	}
-	query := fmt.Sprintf("CREATE DATABASE %s", db)
-	if _, err := dbCons[conf.User].Exec(query); err != nil {
-		return fmt.Errorf("cannot create database '%s': %s", db, err)
+	log.Printf("created database '%s'", dbName)
+	if err := config.InitDb(dbName); err != nil {
+		return fmt.Errorf("db init: %s", err)
 	}
-	if err := initDbCon(db, conf); err != nil {
-		return err
-	}
-	log.Printf("created database '%s'", db)
 	return nil
 }
 
-func createTable(db, table string, conf config.TableType) error {
+func createTable(db, table string) error {
 	var query strings.Builder
 	query.WriteString(fmt.Sprintf("CREATE TABLE %s (", table))
 	i := 0
-	for field := range conf.Fields {
-		f := conf.Fields[field]
+	for field := range config.Config.Databases[db].Tables[table].Fields {
+		f := config.Config.Databases[db].Tables[table].Fields[field]
 		qry := strings.Join([]string{field, f.Type, strings.Join(f.Constraints, " ")}, " ")
-		if i == len(conf.Fields)-1 {
+		if i == len(config.Config.Databases[db].Tables[table].Fields)-1 {
 			query.WriteString(qry)
 			continue
 		}
@@ -95,7 +92,7 @@ func createTable(db, table string, conf config.TableType) error {
 	}
 	query.WriteString(")")
 
-	if _, err := dbCons[db].Exec(query.String()); err != nil {
+	if _, err := config.Db[db].Exec(query.String()); err != nil {
 		return fmt.Errorf("cannot create table '%s' in '%s': %s", table, db, err)
 	}
 	log.Printf("created table '%s' in '%s'", table, db)
@@ -103,44 +100,34 @@ func createTable(db, table string, conf config.TableType) error {
 }
 
 // Drop db:table (all if empty)
-func Drop(db, table string, conf *config.Config) error {
+func Drop(db, table string) error {
 	if db == "" {
-		for db := range conf.Databases {
-			if err := dropDb(db, conf.Databases[db]); err != nil {
-				return err
-			}
+		for db := range config.Config.Databases {
+			dropDb(db, config.Config.Databases[db])
 		}
 	} else {
 		if table != "" {
-			if err := dropTable(db, table, conf.Databases[db]); err != nil {
+			if err := dropTable(db, table, config.Config.Databases[db]); err != nil {
 				return err
 			}
 		}
-		if err := dropDb(db, conf.Databases[db]); err != nil {
-			return err
-		}
+		dropDb(db, config.Config.Databases[db])
 	}
 	return nil
 }
 
-func dropDb(db string, conf config.DbType) error {
-	if err := initDbCon(conf.User, conf); err != nil {
-		return err
-	}
+func dropDb(db string, conf config.DbType) {
 	query := fmt.Sprintf("DROP DATABASE %s", db)
-	if _, err := dbCons[conf.User].Exec(query); err != nil {
-		return fmt.Errorf("cannot drop database '%s': %s", db, err)
+	if _, err := superExec(db, query); err != nil {
+		log.Printf("cannot drop database '%s': %s", db, err)
+		return
 	}
 	log.Printf("dropped database '%s'", db)
-	return nil
 }
 
 func dropTable(db, table string, conf config.DbType) error {
-	if err := initDbCon(db, conf); err != nil {
-		return err
-	}
 	query := fmt.Sprintf("DROP TABLE %s", table)
-	if _, err := dbCons[db].Exec(query); err != nil {
+	if _, err := config.Db[db].Exec(query); err != nil {
 		return fmt.Errorf("cannot drop table '%s' in '%s': %s", table, db, err)
 	}
 	log.Printf("dropped table '%s'", table)
@@ -148,15 +135,15 @@ func dropTable(db, table string, conf config.DbType) error {
 }
 
 // Fill db:table with mock data (all if empty)
-func Fill(db, table string, conf *config.Config) error {
+func Fill(db, table string) error {
 	if db == "" {
-		for db := range conf.Databases {
-			if err := fillDb(db, table, conf.Databases[db]); err != nil {
+		for db := range config.Config.Databases {
+			if err := fillDb(db, table, config.Config.Databases[db]); err != nil {
 				return err
 			}
 		}
 	} else {
-		if err := fillDb(db, table, conf.Databases[db]); err != nil {
+		if err := fillDb(db, table, config.Config.Databases[db]); err != nil {
 			return err
 		}
 	}
@@ -164,9 +151,6 @@ func Fill(db, table string, conf *config.Config) error {
 }
 
 func fillDb(db, table string, conf config.DbType) error {
-	if err := initDbCon(db, conf); err != nil {
-		return err
-	}
 	if table == "" {
 		for table := range conf.Tables {
 			if err := fillDbTable(db, table, conf.Tables[table]); err != nil {
@@ -196,7 +180,7 @@ func fillDbTable(db, table string, conf config.TableType) error {
 		query.WriteString(bv.String()[:len(bv.String())-1])
 		query.WriteString(")")
 
-		if _, err := dbCons[db].Exec(query.String()); err != nil {
+		if _, err := config.Db[db].Exec(query.String()); err != nil {
 			log.Printf("cannot insert into '%s/%s': %s", db, table, err)
 		}
 	}

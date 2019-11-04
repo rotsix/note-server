@@ -10,7 +10,10 @@ import (
 )
 
 func main() {
-	conf := config.Parse()
+	if err := config.Parse(); err != nil {
+		log.Println("config parsing: ", err)
+		panic(err)
+	}
 	force := false
 
 	app := cli.NewApp()
@@ -27,18 +30,18 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if force {
-					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1), conf); err != nil {
+					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1)); err != nil {
 						log.Println(err)
 					}
 				}
-				return dbcli.Create(c.Args().First(), c.Args().Get(1), conf)
+				return dbcli.Create(c.Args().First(), c.Args().Get(1))
 			},
 		},
 		{
 			Name:  "drop",
 			Usage: "drop [database [table]] all if unspecified",
 			Action: func(c *cli.Context) error {
-				return dbcli.Drop(c.Args().First(), c.Args().Get(1), conf)
+				return dbcli.Drop(c.Args().First(), c.Args().Get(1))
 			},
 		},
 		{
@@ -53,27 +56,27 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if force {
-					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1), conf); err != nil {
+					if err := dbcli.Drop(c.Args().First(), c.Args().Get(1)); err != nil {
 						log.Println(err)
 					}
-					if err := dbcli.Create(c.Args().First(), c.Args().Get(1), conf); err != nil {
+					if err := dbcli.Create(c.Args().First(), c.Args().Get(1)); err != nil {
 						panic(err)
 					}
 				}
-				return dbcli.Fill(c.Args().First(), c.Args().Get(1), conf)
+				return dbcli.Fill(c.Args().First(), c.Args().Get(1))
 			},
 		},
 		{
 			Name:  "all",
 			Usage: "drop; create; fill",
 			Action: func(c *cli.Context) error {
-				if err := dbcli.Drop("", "", conf); err != nil {
+				if err := dbcli.Drop("", ""); err != nil {
 					log.Println(err)
 				}
-				if err := dbcli.Create("", "", conf); err != nil {
+				if err := dbcli.Create("", ""); err != nil {
 					panic(err)
 				}
-				if err := dbcli.Fill("", "", conf); err != nil {
+				if err := dbcli.Fill("", ""); err != nil {
 					panic(err)
 				}
 				return nil
