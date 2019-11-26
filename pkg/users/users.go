@@ -50,12 +50,12 @@ func Login(username, password string) (string, error) {
 
 // Logout removes [token] from logged users
 func Logout(tok string) error {
+	log.Printf("pkg/users/users.go:Logout: # TODO")
 	if tok == "" {
 		return nil
 	}
 
-	// NOTE remove from sessions
-	log.Printf("pkg/users/users.go:Logout: # TODO")
+	// NOTE remove from db[users].sessions
 
 	return nil
 }

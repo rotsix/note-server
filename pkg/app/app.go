@@ -32,5 +32,5 @@ func Run() {
 
 	log.Println("launching server")
 	log.Println("  ------------")
-	log.Fatalln(http3.ListenAndServe("localhost:8080", cert, key, r))
+	log.Fatalln(http3.ListenAndServe(":8080", cert, key, r))
 }

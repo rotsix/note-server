@@ -1,5 +1,22 @@
 # server
 
+## Install
+
+- create certs with mkcert
+- dbcli all
+
+## Running
+
+You can decide to run it just using docker-compose, then run `docker-compose up`.
+Don't forget to pass `--build` option when modifying code.
+
+To mix between local server and dockerized db, run:
+
+- `docker-compose up db`
+- `source alias.sh; server_local`
+
+Mock users are `test/test` and `testN/testN` with N in 1-2-3.
+
 ## Databases
 
 ### users

@@ -22,29 +22,24 @@
             "password": {
               "type": "text",
               "constraints": ["not null"]
-            },
-            "firstname": {
-              "type": "text"
-            },
-            "lastname": {
-              "type": "text"
-            },
-            "mail": {
-              "type": "text",
-              "constraints": ["not null unique"]
-            },
-            "birthdate": {
-              "type": "date"
             }
           },
           "mock": {
             "test": {
               "username": "test",
-              "password": "test",
-              "firstname": "Foo",
-              "lastname": "Bar",
-              "mail": "foo@bar.xyz",
-              "birthdate": "1970-01-01"
+              "password": "test"
+            },
+            "test1": {
+              "username": "test1",
+              "password": "test1"
+            },
+            "test2": {
+              "username": "test2",
+              "password": "test2"
+            },
+            "test3": {
+              "username": "test3",
+              "password": "test3"
             }
           }
         },
