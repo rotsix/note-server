@@ -2,17 +2,18 @@
 
 ## Install
 
-- create certs with mkcert
-- dbcli all
+- install and trust certs: `mkcert localhost; mkcert -install`
+- retrieve dependencies: `go get ./...`
+- set up databases: `docker-compose up -d db; source alias.sh; db_local`
 
 ## Running
 
-You can decide to run it just using docker-compose, then run `docker-compose up`.
+You can run it using docker-compose, (`docker-compose up`).
 Don't forget to pass `--build` option when modifying code.
 
 To mix between local server and dockerized db, run:
 
-- `docker-compose up db`
+- `docker-compose up -d db`
 - `source alias.sh; server_local`
 
 Mock users are `test/test` and `testN/testN` with N in 1-2-3.
@@ -27,17 +28,7 @@ Stores users' informations (account relative)
   - id
   - user_id
   - token
-- informations: users information
+- informations
   - id
   - username
   - password
-  - firstname
-  - lastname
-  - mail
-  - birthdate
-  - address
-  - zip_code
-  - city
-- configurations: client configurations
-  - TODO: could be good to store this
-  - eg. light/dark display, notifications frequency..
