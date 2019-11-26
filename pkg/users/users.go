@@ -30,14 +30,6 @@ func Login(username, password string) (string, error) {
 	}
 
 	log.Println("pkg/users/users.go:Login: # TODO generate token")
-	/*
-		// now, we have user's id, let's create a token, and make a new session
-		tok, err := token.Gen(id)
-		if err != nil {
-			return "", new(errors.Internal)
-		}
-	*/
-
 	log.Println("pkg/users/users.go:Login: # TODO insert created session into db")
 	/*
 		lastSeen := "1970-01-01"

@@ -2,11 +2,12 @@ package app
 
 import (
 	"log"
-	"net/http"
+	"os"
 	"server/internal/routes"
 	"server/pkg/config"
 
 	"github.com/gorilla/mux"
+	"github.com/lucas-clemente/quic-go/http3"
 )
 
 // Run is the app main loop
@@ -16,18 +17,20 @@ func Run() {
 		panic(err)
 	}
 
-	for dbName := range config.Config.Databases {
-		if err := config.InitDb(dbName); err != nil {
-			log.Printf("db init '%s': %s", dbName, err)
-			panic(err)
-
-		}
+	if err := config.InitDb(""); err != nil {
+		log.Printf("db init: %s", err)
+		panic(err)
 	}
 
 	r := mux.NewRouter()
 	routes.HandleUsers(r.PathPrefix("/users/").Subrouter())
 
+	cert, key := os.Getenv("CERT_LOCATION"), os.Getenv("KEY_LOCATION")
+	if cert == "" || key == "" {
+		log.Fatalln("couldn't read CERT_LOCATION or KEY_LOCATION in env")
+	}
+
 	log.Println("launching server")
 	log.Println("  ------------")
-	log.Fatalln(http.ListenAndServe(":8080", r))
+	log.Fatalln(http3.ListenAndServe("localhost:8080", cert, key, r))
 }
