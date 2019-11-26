@@ -47,7 +47,6 @@ func logout(rw http.ResponseWriter, r *http.Request) {
 		errors.Manage(rw, err)
 		return
 	}
-	Success(rw)
 }
 
 func signIn(rw http.ResponseWriter, r *http.Request) {

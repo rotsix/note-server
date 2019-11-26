@@ -51,7 +51,7 @@ func Login(username, password string) (string, error) {
 // Logout removes [token] from logged users
 func Logout(tok string) error {
 	if tok == "" {
-		return new(errors.NotFound)
+		return nil
 	}
 
 	// NOTE remove from sessions
