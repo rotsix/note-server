@@ -1,4 +1,4 @@
-package users
+package auth
 
 import (
 	"database/sql"
@@ -6,6 +6,7 @@ import (
 
 	"server/pkg/config"
 	"server/pkg/errors"
+	"server/pkg/token"
 )
 
 // Login returns a token, or an error in case of fail
@@ -15,7 +16,7 @@ func Login(username, password string) (string, error) {
 	}
 
 	var id int
-	row := config.Db["users"].QueryRow("SELECT id FROM informations WHERE (username=$1 AND password=$2)", username, password)
+	row := config.Db["note"].QueryRow("SELECT id FROM accounts WHERE (username=$1 AND password=$2)", username, password)
 	err := row.Scan(&id)
 	if err != nil {
 		switch err {
@@ -24,38 +25,45 @@ func Login(username, password string) (string, error) {
 			log.Printf("failed to login: %s:%s", username, password)
 			return "", new(errors.Unauthorized)
 		default:
-			log.Printf("pkg/users/users.go:Login: error during results' scan: %s", err)
+			log.Printf("pkg/auth/auth.go:Login: error during results' scan: %s", err)
 			return "", new(errors.Internal)
 		}
 	}
 
-	log.Println("pkg/users/users.go:Login: # TODO generate token")
-	log.Println("pkg/users/users.go:Login: # TODO insert created session into db")
+	var tok string
+	tok, err = token.New()
+	if err != nil {
+		return "", new(errors.Internal)
+	}
+
+	tok = "t0k3n"
+	log.Println("pkg/auth/auth.go:Login: # TODO insert created session into db")
 	/*
 		lastSeen := "1970-01-01"
 		expiration := "1970-01-01"
 
-		if _, err := config.Db["users"].Exec(
+		if _, err := config.Db["note"].Exec(
 			"INSERT INTO sessions(uid, token, last_seen, expiration) VALUES ($1, $2, $3, $4)",
 			id, tok, lastSeen, expiration,
 		); err != nil {
-			log.Printf("pkg/users/users.go:Login: cannot create session: %s", err)
+			log.Printf("pkg/auth/auth.go:Login: cannot create session: %s", err)
 			return "", new(errors.Internal)
 		}
 	*/
 
-	tok := "t0k3n"
 	return tok, nil
 }
 
 // Logout removes [token] from logged users
-func Logout(tok string) error {
-	log.Printf("pkg/users/users.go:Logout: # TODO")
-	if tok == "" {
+func Logout(uidStr string) error {
+	log.Printf("pkg/auth/auth.go:Logout: # TODO")
+
+	if uidStr == "" {
 		return nil
 	}
 
-	// NOTE remove from db[users].sessions
+	// NOTE remove from db[note].sessions
+	token.Parse()
 
 	return nil
 }
