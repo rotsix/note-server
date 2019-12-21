@@ -41,7 +41,7 @@ type TableType struct {
 	MockData    mockType             `json:"mock"`
 }
 
-// map which associates string with a map of string -> string
+// map which associates string with a map of string->string (map of maps)
 type mockType = map[string]map[string]string
 
 // FieldType represents a table's field in config
@@ -50,7 +50,7 @@ type FieldType struct {
 	Constraints []string `json:"constraints"`
 }
 
-// InitDb initialises databases connections
+// InitDb initialises a database connection (empty for all)
 func InitDb(name string) error {
 	f := func(dbName string) error {
 		dbConf := Config.Databases[dbName]
