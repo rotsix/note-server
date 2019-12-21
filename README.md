@@ -18,17 +18,14 @@ To mix between local server and dockerized db, run:
 
 Mock users are `test/test` and `testN/testN` with N in 1-2-3.
 
-## Databases
+## Database, and tables
 
-### users
-
-Stores users' informations (account relative)
-
+db note:
 - sessions
   - id
   - user_id
   - token
-- informations
+- accounts
   - id
   - username
   - password
