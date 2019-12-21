@@ -1,15 +1,15 @@
 {
   "databases": {
-  	"users": {
+  	"note": {
   	  "host": "db",
   	  "port": 5432,
   	  "driver": "postgres",
   	  "user": "docker",
   	  "pass": "docker",
-      "desc": "contains users' informations (account relative)",
+      "desc": "contains items and account management",
       "tables": {
-        "informations": {
-          "desc": "stores users' accounts informations",
+        "accounts": {
+          "desc": "stores accounts",
           "fields": {
             "id": {
               "type": "bigserial",
@@ -52,7 +52,7 @@
             },
             "uid": {
               "type": "bigserial",
-              "constraints": ["not null"]
+              "constraints": ["references accounts(id)"]
             },
             "token": {
               "type": "text",
@@ -65,6 +65,57 @@
             "last_seen": {
               "type": "timestamp without time zone",
               "constraints": ["not null"]
+            }
+          }
+        },
+        "items": {
+          "desc": "contains notes",
+          "fields": {
+            "id": {
+              "type": "bigserial",
+              "constraints": ["primary key"]
+            },
+            "uid": {
+              "type": "bigserial",
+              "constraints": ["references accounts(id)"]
+            },
+            "creation_date": {
+              "type": "timestamp",
+              "constraints": ["not null"]
+            },
+            "edition_date": {
+              "type": "timestamp",
+              "constraints": ["not null"]
+            },
+            "title": {
+              "type": "text",
+              "constraints": ["not null"]
+            },
+            "description": {
+              "type": "text"
+            }
+          },
+          "mock": {
+            "test": {
+              "uid": "1",
+              "creation_date": "2019-12-17 23:15:01",
+              "edition_date": "2019-12-21 02:02:34",
+              "title": "This is a note",
+              "description": "Waouw, this is a nice test!"
+            },
+            "test2": {
+              "uid": "1",
+              "creation_date": "2019-12-17 23:21:32",
+              "edition_date": "2019-12-21 00:01:10",
+              "title": "This is another note",
+              "description": "This one is another test."
+            },
+            "test3": {
+              "uid": "1",
+              "creation_date": "2019-12-18 12:37:42",
+              "edition_date": "2019-12-18 12:37:42",
+              "title": "Foobar barfoo",
+              "description": "Lorem ipsum dolor sit amet"
             }
           }
         }
