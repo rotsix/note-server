@@ -23,7 +23,8 @@ func Run() {
 	}
 
 	r := mux.NewRouter()
-	routes.HandleUsers(r.PathPrefix("/users/").Subrouter())
+	routes.HandleAuth(r.PathPrefix("/auth/").Subrouter())
+	routes.HandleNotes(r.PathPrefix("/notes/").Subrouter())
 
 	cert, key := os.Getenv("CERT_LOCATION"), os.Getenv("KEY_LOCATION")
 	if cert == "" || key == "" {
