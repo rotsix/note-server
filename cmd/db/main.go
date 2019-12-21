@@ -17,12 +17,12 @@ func main() {
 	force := false
 
 	app := cli.NewApp()
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:  "create",
 			Usage: "create [database [table]] all if unspecified",
 			Flags: []cli.Flag{
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:        "f",
 					Usage:       "force action (drop; create)",
 					Destination: &force,
@@ -48,7 +48,7 @@ func main() {
 			Name:  "fill",
 			Usage: "fill [database [table]] all if unspecified",
 			Flags: []cli.Flag{
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:        "f",
 					Usage:       "force action (drop; create; fill)",
 					Destination: &force,
