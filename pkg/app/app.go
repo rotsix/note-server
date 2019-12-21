@@ -3,8 +3,8 @@ package app
 import (
 	"log"
 	"os"
-	"server/internal/routes"
-	"server/pkg/config"
+	"note-server/internal/routes"
+	"note-server/pkg/config"
 
 	"github.com/gorilla/mux"
 	"github.com/lucas-clemente/quic-go/http3"

@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"log"
 
-	"server/pkg/config"
-	"server/pkg/errors"
-	"server/pkg/token"
+	"note-server/pkg/config"
+	"note-server/pkg/errors"
+	"note-server/pkg/token"
 )
 
 // Login returns a token, or an error in case of fail

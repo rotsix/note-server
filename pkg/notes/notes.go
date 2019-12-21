@@ -3,8 +3,8 @@ package notes
 import (
 	"database/sql"
 	"log"
-	"server/pkg/config"
-	"server/pkg/errors"
+	"note-server/pkg/config"
+	"note-server/pkg/errors"
 	"strconv"
 	"time"
 )

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"server/pkg/config"
+	"note-server/pkg/config"
 	"strings"
 
 	// postgres driver

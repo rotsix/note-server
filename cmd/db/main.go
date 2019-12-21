@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"os"
-	"server/pkg/config"
-	"server/pkg/dbcli"
+	"note-server/pkg/config"
+	"note-server/pkg/dbcli"
 
 	"github.com/urfave/cli"
 )

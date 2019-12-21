@@ -3,8 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
-	"server/pkg/errors"
-	"server/pkg/notes"
+	"note-server/pkg/errors"
+	"note-server/pkg/notes"
 
 	"github.com/gorilla/mux"
 )

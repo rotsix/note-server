@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/pkg/auth"
-	"server/pkg/errors"
+	"note-server/pkg/auth"
+	"note-server/pkg/errors"
 
 	"github.com/gorilla/mux"
 )

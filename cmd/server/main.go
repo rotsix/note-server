@@ -1,7 +1,7 @@
 package main
 
 import (
-	"server/pkg/app"
+	"note-server/pkg/app"
 )
 
 func main() {

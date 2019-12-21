@@ -29,3 +29,19 @@ db note:
   - id
   - username
   - password
+
+
+## Todo
+
+### Authentication
+
+Creating and parsing tokens
+Note: JWT
+
+Managing other authentication protocols
+Note: fido2, webauthn, oauth2, sqrl
+
+### cli
+
+Fix foreign keys order bug
+Order tables when creating/filling (accounts, then session and items)
