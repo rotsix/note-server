@@ -2,9 +2,9 @@ package app
 
 import (
 	"log"
-	"os"
 	"note-server/internal/routes"
 	"note-server/pkg/config"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/lucas-clemente/quic-go/http3"

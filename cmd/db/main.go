@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"os"
 	"note-server/pkg/config"
 	"note-server/pkg/dbcli"
+	"os"
 
 	"github.com/urfave/cli"
 )
