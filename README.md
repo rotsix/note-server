@@ -33,15 +33,8 @@ db note:
 
 ## Todo
 
-### Authentication
-
-Creating and parsing tokens
-Note: JWT
-
-Managing other authentication protocols
-Note: fido2, webauthn, oauth2, sqrl
-
-### cli
-
-Fix foreign keys order bug
-Order tables when creating/filling (accounts, then session and items)
+- authentication:
+  - creating and parsing tokens (`jwt`)
+  - Implement `webauthn` login and register
+- cli:
+  - fix foreign keys order bug (order tables when creating/filling (accounts, then session and items))
