@@ -20,6 +20,8 @@ WORKDIR /app
 COPY --from=builder /go/src/server/server .
 COPY ./configs .
 ENV CONF_LOCATION /app/config.json
+ENV CERT_LOCATION /app/cert.pem
+ENV KEY_LOCATION  /app/key.pem
 EXPOSE 8080
 
 CMD ["./server"]
