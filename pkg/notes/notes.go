@@ -114,3 +114,35 @@ func Get(uidStr, idStr string) (*NoteType, error) {
 
 	return note, nil
 }
+
+// All retrieves notes' id from a given id
+func All(uidStr string) ([]int, error) {
+	if _, err := strconv.Atoi(uidStr); err != nil {
+		return nil, new(errors.BadRequest)
+	}
+
+	query := `SELECT id FROM items WHERE uid=$1`
+	rows, err := config.Db["note"].Query(query, uidStr)
+	if err != nil {
+		log.Printf("pkg/notes/notes.go:All: error during results' scan: %s", err)
+		return nil, new(errors.Internal)
+	}
+	defer rows.Close()
+
+	var res []int
+	for rows.Next() {
+		var id int
+		if err = rows.Scan(&id); err != nil {
+			log.Printf("pkg/notes/notes.go:All: error during results' scan: %s", err)
+			return nil, new(errors.Internal)
+		}
+
+		res = append(res, id)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("pkg/notes/notes.go:All: error during results' scan: %s", err)
+		return nil, new(errors.Internal)
+	}
+	return res, nil
+}
