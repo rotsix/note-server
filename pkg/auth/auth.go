@@ -18,6 +18,7 @@ func Login(username, password string) (string, error) {
 	var id int
 	row := config.Db["note"].QueryRow("SELECT id FROM accounts WHERE (username=$1 AND password=$2)", username, password)
 	err := row.Scan(&id)
+
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
@@ -64,6 +65,17 @@ func Logout(uidStr string) error {
 
 	// NOTE remove from db[note].sessions
 	token.Parse()
+
+	return nil
+}
+
+// SignIn creates a new user in database
+func SignIn(username, password string) error {
+	if username == "" || password == "" {
+		return new(errors.BadRequest)
+	}
+
+	log.Println("pkg/auth/auth.go:SignIn: # TODO")
 
 	return nil
 }
