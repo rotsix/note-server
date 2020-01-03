@@ -41,17 +41,22 @@ func (e *Internal) Error() string {
 
 // Manage handles errors
 func Manage(rw http.ResponseWriter, err error) {
+	sendErr := func(errCode int) {
+		http.Error(rw, err.Error(), errCode)
+	}
+
 	switch err.(type) {
 	case *BadRequest:
+		sendErr(http.StatusBadRequest)
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 	case *Unauthorized:
-		http.Error(rw, err.Error(), http.StatusUnauthorized)
+		sendErr(http.StatusUnauthorized)
 	case *Forbidden:
-		http.Error(rw, err.Error(), http.StatusForbidden)
+		sendErr(http.StatusForbidden)
 	case *NotFound:
-		http.Error(rw, err.Error(), http.StatusNotFound)
+		sendErr(http.StatusNotFound)
 	case *Internal:
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		sendErr(http.StatusInternalServerError)
 	default:
 		panic(err)
 	}
