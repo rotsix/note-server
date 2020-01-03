@@ -18,7 +18,7 @@ func exists(uid int) bool {
 
 // gives current date
 func currentDate() string {
-	log.Println("pkg/notes/notes.go:currentDate: # TODO why this date format and not another one?")
+	log.Println("pkg/notes/notes.go:currentDate: # NOTE why this date format and not another one?")
 	return time.Now().Format("2006-01-02 15:04:05")
 }
 
