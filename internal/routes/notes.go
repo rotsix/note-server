@@ -87,5 +87,5 @@ func all(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// "1,2,3"
-	WriteJSON(rw, strings.Join(notesStr, ","))
+	rw.Write([]byte(strings.Join(notesStr, ",")))
 }

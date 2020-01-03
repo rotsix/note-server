@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"note-server/pkg/auth"
 	"note-server/pkg/errors"
@@ -42,5 +41,12 @@ func logout(rw http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(rw http.ResponseWriter, r *http.Request) {
-	log.Println("internal/routes/auth.go:signIn: # TODO")
+	ParseForm(r)
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+
+	if err := auth.SignIn(username, password); err != nil {
+		errors.Manage(rw, err)
+		return
+	}
 }
