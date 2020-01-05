@@ -22,12 +22,13 @@ func ParseForm(r *http.Request) {
 
 // GetToken from request
 func GetToken(r *http.Request) map[string]string {
-	ParseForm(r)
-	tokenRaw := r.Form.Get("token")
+	tokenRaw, err := r.Cookie("token")
+	if err != nil {
+		return nil
+	}
 
 	log.Println("internal/routes/utils.go:GetToken: # TODO parse token")
 	_ = tokenRaw
-
 	token := map[string]string{"uid": "1"}
 
 	return token

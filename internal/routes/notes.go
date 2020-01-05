@@ -16,13 +16,14 @@ func HandleNotes(r *mux.Router) {
 	r.HandleFunc("/new", new).Methods("POST")
 	r.HandleFunc("/delete", delete).Methods("POST")
 	r.HandleFunc("/modify", modify).Methods("POST")
-	r.HandleFunc("/get", get).Methods("POST")
-	r.HandleFunc("/all", all).Methods("POST")
+	r.HandleFunc("/get", get).Methods("GET")
+	r.HandleFunc("/all", all).Methods("GET")
 }
 
 func new(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
+	ParseForm(r)
 	title := r.Form.Get("title")
 	description := r.Form.Get("description")
 
@@ -35,6 +36,7 @@ func new(rw http.ResponseWriter, r *http.Request) {
 func delete(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
+	ParseForm(r)
 	id := r.Form.Get("id")
 	if err := notes.Delete(uid, id); err != nil {
 		errors.Manage(rw, err)
@@ -45,6 +47,7 @@ func delete(rw http.ResponseWriter, r *http.Request) {
 func modify(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
+	ParseForm(r)
 	id := r.Form.Get("id")
 	title := r.Form.Get("title")
 	description := r.Form.Get("description")
@@ -58,7 +61,11 @@ func modify(rw http.ResponseWriter, r *http.Request) {
 func get(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
-	id := r.Form.Get("id")
+	ids := r.URL.Query()["id"]
+	if len(ids) < 1 {
+		return
+	}
+	id := ids[0]
 
 	note, err := notes.Get(uid, id)
 	if err != nil {
