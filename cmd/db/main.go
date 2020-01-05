@@ -17,7 +17,7 @@ func main() {
 	force := false
 
 	app := cli.NewApp()
-	app.Commands = []*cli.Command{
+	app.Commands = []cli.Command{
 		{
 			Name:  "create",
 			Usage: "create [database [table]] all if unspecified",
