@@ -34,7 +34,20 @@ db note:
 ## Todo
 
 - authentication:
-  - creating and parsing tokens (`jwt`)
+  - create and parse tokens (`jwt`)
   - Implement `webauthn` login and register
+  - add route `/auth/delete` to delete an account
 - cli:
   - fix foreign keys order bug (order tables when creating/filling (accounts, then session and items))
+- routes:
+  - set proper request handlers type (post, get, put, delete...)
+  - switch to `fasthttp`
+    - https://github.com/valyala/fasthttp
+    - https://github.com/julienschmidt/httprouter
+- testing:
+  - write unit tests, functionnal tests
+  - set tests steps
+    - init: create an user, add a note
+    - end: delete note, delete user
+- ci-cd:
+  - on merge: trigger build on circle-ci
