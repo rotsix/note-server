@@ -14,10 +14,15 @@ import (
 // HandleNotes handles routes for /notes prefix
 func HandleNotes(r *mux.Router) {
 	r.HandleFunc("/new", new).Methods("POST")
-	r.HandleFunc("/delete", delete).Methods("POST")
-	r.HandleFunc("/modify", modify).Methods("POST")
-	r.HandleFunc("/get", get).Methods("GET")
+	r.HandleFunc("/delete/{id:[0-9]+}", delete).Methods("POST")
+	r.HandleFunc("/modify/{id:[0-9]+}", modify).Methods("PUT")
+	r.HandleFunc("/get/{id:[0-9]+}", get).Methods("GET")
 	r.HandleFunc("/all", all).Methods("GET")
+}
+
+func getID(r *http.Request) string {
+	vars := mux.Vars(r)
+	return vars["id"]
 }
 
 func new(rw http.ResponseWriter, r *http.Request) {
@@ -36,8 +41,7 @@ func new(rw http.ResponseWriter, r *http.Request) {
 func delete(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
-	ParseForm(r)
-	id := r.Form.Get("id")
+	id := getID(r)
 	if err := notes.Delete(uid, id); err != nil {
 		errors.Manage(rw, err)
 		return
@@ -48,7 +52,7 @@ func modify(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
 	ParseForm(r)
-	id := r.Form.Get("id")
+	id := getID(r)
 	title := r.Form.Get("title")
 	description := r.Form.Get("description")
 
@@ -61,11 +65,7 @@ func modify(rw http.ResponseWriter, r *http.Request) {
 func get(rw http.ResponseWriter, r *http.Request) {
 	token := GetToken(r)
 	uid := token["uid"]
-	ids := r.URL.Query()["id"]
-	if len(ids) < 1 {
-		return
-	}
-	id := ids[0]
+	id := getID(r)
 
 	note, err := notes.Get(uid, id)
 	if err != nil {
