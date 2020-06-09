@@ -3,6 +3,7 @@ package auth
 import (
 	"database/sql"
 	"log"
+	"strconv"
 
 	"note-server/pkg/config"
 	"note-server/pkg/errors"
@@ -32,12 +33,11 @@ func Login(username, password string) (string, error) {
 	}
 
 	var tok string
-	tok, err = token.New()
+	tok, err = token.New(id)
 	if err != nil {
 		return "", new(errors.Internal)
 	}
 
-	tok = "t0k3n"
 	log.Println("pkg/auth/auth.go:Login: # TODO insert created session into db")
 	/*
 		lastSeen := "1970-01-01"
@@ -64,8 +64,6 @@ func Logout(uidStr string) error {
 	}
 
 	// NOTE remove from db[note].sessions
-	token.Parse()
-
 	return nil
 }
 
@@ -76,6 +74,26 @@ func SignIn(username, password string) error {
 	}
 
 	log.Println("pkg/auth/auth.go:SignIn: # TODO")
+
+	return nil
+}
+
+// DeleteAccount and associated notes
+func DeleteAccount(uidStr string) error {
+	if _, err := strconv.Atoi(uidStr); err != nil {
+		return new(errors.BadRequest)
+	}
+
+	log.Println("pkg/auth/auth.go:DeleteAccount: # TODO")
+	whatisthat, err := config.Db["note"].Exec("")
+	_ = whatisthat
+
+	if err != nil {
+		switch err.(type) {
+		default:
+			return new(errors.Internal)
+		}
+	}
 
 	return nil
 }

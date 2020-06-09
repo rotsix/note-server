@@ -14,6 +14,7 @@ func HandleAuth(r *mux.Router) {
 	r.HandleFunc("/login", login).Methods("POST")
 	r.HandleFunc("/logout", logout).Methods("POST")
 	r.HandleFunc("/signin", signIn).Methods("POST")
+	r.HandleFunc("/delete", deleteAccount).Methods("DELETE")
 }
 
 func login(rw http.ResponseWriter, r *http.Request) {
@@ -46,6 +47,15 @@ func signIn(rw http.ResponseWriter, r *http.Request) {
 	password := r.Form.Get("password")
 
 	if err := auth.SignIn(username, password); err != nil {
+		errors.Manage(rw, err)
+		return
+	}
+}
+
+func deleteAccount(rw http.ResponseWriter, r *http.Request) {
+	token := GetToken(r)
+	uid := token["uid"]
+	if err := auth.DeleteAccount(uid); err != nil {
 		errors.Manage(rw, err)
 		return
 	}
