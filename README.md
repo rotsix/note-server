@@ -75,7 +75,7 @@ db note:
     - https://github.com/julienschmidt/httprouter
 - testing:
   - write unit tests, functionnal tests [0]
-  - steps
+  - steps (simplier: create a new db, and run `db all`)
     - signin, login
     - creating account, creating note
     - get all notes, get note, modify note
