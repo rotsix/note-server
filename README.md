@@ -2,7 +2,7 @@
 
 `server` is a note taking Rest API.
 
-This project is made up of a Go application interacting with a Postgres database.
+This project is made up of a Go (golang) application interacting with a Postgres database.
 
 ## Installation
 
@@ -19,19 +19,21 @@ Type following commands to prepare running environment.
 
 ## Usage
 
-Application can be launched using `docker-compose up`, in this case set d
+Application can be launched using `docker-compose up`.
 Don't forget to pass `--build` option when modifying code.
 
-If running all through docker, set database name to docker-compose service (default `db`) name in configuration file.
+If running all in docker containers, set the database name to docker-compose service (default `db`) name in configuration file.
 Or if the app is running using plain Go commands, set database name to `localhost`.
-
 
 Or mix between local server and dockerized database, so run:
 
 - `docker-compose up -d db`
 - `source alias.sh; server_local`
 
+> Don't forget to set the `KEY_LOCATION`, `CERT_LOCATION` and `CONF_LOCATION` environment variables.
+
 Mock users are `test/test` and `testN/testN` with N in 1-2-3.
+The `test` user already have some notes associated.
 
 ## Database and tables
 
